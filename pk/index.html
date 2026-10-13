@@ -1,31 +1,553 @@
-
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIM-KDP PPPK</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            background-color: #F3F4F6;
-        }
-        iframe {
-            border: none;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101C2C">
+  <meta name="description" content="Portal resmi akses dan unduh dokumen PK Tahun 2026.">
+  <title>PORTAL DOKUMEN | PK 2026</title>
+
+  <link rel="preconnect" href="https://script.google.com">
+  <link rel="preconnect" href="https://script.googleusercontent.com">
+
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #101c2c;
+      --navy-light: #192b40;
+      --gold: #c8a96b;
+      --gold-light: #e5d2a5;
+      --paper: #f5f6f8;
+      --white: #ffffff;
+      --text: #182537;
+      --muted: #788394;
+      --border: #e4e8ee;
+      --success: #27836a;
+      --shadow: 0 24px 70px rgba(16, 28, 44, .13);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--paper);
+      color: var(--text);
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    button, a {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    .portal {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100dvh;
+      min-height: 0;
+    }
+
+    /* Header */
+    .topbar {
+      z-index: 5;
+      flex-shrink: 0;
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px clamp(16px, 4vw, 54px);
+      background: var(--navy);
+      border-bottom: 1px solid rgba(200, 169, 107, .35);
+      color: var(--white);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      border: 1px solid rgba(229, 210, 165, .75);
+      border-radius: 13px;
+      color: var(--gold-light);
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(
+        145deg,
+        rgba(200, 169, 107, .18),
+        rgba(255, 255, 255, .025)
+      );
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 750;
+      letter-spacing: .11em;
+    }
+
+    .brand-subtitle {
+      margin: 3px 0 0;
+      color: #bdc7d4;
+      font-size: 11px;
+      letter-spacing: .045em;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #d7e1eb;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #68c6a3;
+      box-shadow: 0 0 12px rgba(104, 198, 163, .5);
+    }
+
+    /* Main workspace */
+    .workspace {
+      position: relative;
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      padding: clamp(10px, 2vw, 22px);
+    }
+
+    .application-frame {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid #e0e5ec;
+      border-radius: 15px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .frame-accent {
+      position: absolute;
+      z-index: 2;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(
+        90deg,
+        var(--navy),
+        var(--gold),
+        var(--gold-light),
+        var(--navy)
+      );
+      pointer-events: none;
+    }
+
+    .app-frame {
+      position: relative;
+      z-index: 1;
+      display: block;
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border: 0;
+      background: var(--white);
+      opacity: 0;
+      transition: opacity .4s ease;
+    }
+
+    .app-frame.loaded {
+      opacity: 1;
+    }
+
+    /* Initial loading screen */
+    .loader {
+      position: absolute;
+      z-index: 3;
+      inset: 3px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background:
+        radial-gradient(
+          ellipse at 50% 40%,
+          rgba(200, 169, 107, .09),
+          transparent 55%
+        ),
+        #fff;
+      text-align: center;
+      transition: opacity .35s ease, visibility .35s ease;
+    }
+
+    .loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-emblem {
+      display: grid;
+      place-items: center;
+      width: 68px;
+      height: 68px;
+      margin-bottom: 27px;
+      border: 1px solid #dfc995;
+      border-radius: 21px;
+      background: linear-gradient(145deg, #fff, #f6f0e3);
+      color: #94733d;
+      font-size: 30px;
+      box-shadow: 0 12px 35px rgba(130, 102, 51, .1);
+    }
+
+    .eyebrow {
+      margin: 0 0 11px;
+      color: #94733d;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    .loader h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(23px, 3vw, 34px);
+      font-weight: 750;
+      letter-spacing: -.045em;
+    }
+
+    .loader-description {
+      max-width: 370px;
+      margin: 12px 0 25px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .progress-track {
+      width: min(260px, 78%);
+      height: 3px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #e9edf2;
+    }
+
+    .progress-bar {
+      width: 35%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--navy), var(--gold));
+      animation: loading 1.5s ease-in-out infinite;
+    }
+
+    .loader-status {
+      margin-top: 15px;
+      color: #8a94a2;
+      font-size: 11px;
+      letter-spacing: .025em;
+    }
+
+    .slow-message {
+      display: none;
+      max-width: 400px;
+      margin-top: 22px;
+      color: #677386;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .slow-message.visible {
+      display: block;
+    }
+
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      margin-top: 15px;
+      padding: 0 17px;
+      border: 1px solid #d8c28e;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--navy);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .action-link:hover {
+      background: #faf6ed;
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    .footer {
+      display: flex;
+      flex-shrink: 0;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 42px;
+      padding: 8px clamp(16px, 4vw, 54px);
+      background: #fff;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .025em;
+    }
+
+    .footer strong {
+      color: #667284;
+      font-weight: 650;
+    }
+
+    .footer-right {
+      text-align: right;
+    }
+
+    @keyframes loading {
+      0%   { transform: translateX(-110%); }
+      50%  { transform: translateX(100%); }
+      100% { transform: translateX(300%); }
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        min-height: 67px;
+        padding: 10px 15px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 19px;
+      }
+
+      .brand-title {
+        font-size: 11px;
+        letter-spacing: .065em;
+      }
+
+      .brand-subtitle {
+        font-size: 10px;
+      }
+
+      .header-status {
+        gap: 6px;
+        font-size: 10px;
+      }
+
+      .workspace {
+        padding: 7px;
+      }
+
+      .application-frame {
+        border-radius: 10px;
+      }
+
+      .footer {
+        min-height: 37px;
+        padding: 7px 12px;
+        font-size: 9px;
+      }
+
+      .loader-emblem {
+        width: 58px;
+        height: 58px;
+        border-radius: 17px;
+      }
+
+      .loader-description {
+        font-size: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div class="portal">
 
-    <!-- Jembatan Pengubung ke Google Apps Script Web App -->
-    <iframe src="https://script.google.com/macros/s/AKfycbwtqQ0cxJAwkzMHlCw3KPUNVkf1NQwPOy71RRYG3s3KffMN2FSBKzeq_nzMMZl555gbQA/exec"></iframe>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">P</div>
+        <div class="brand-copy">
+          <p class="brand-title">PORTAL DOKUMEN RESMI</p>
+          <p class="brand-subtitle">Layanan Digital · Tahun Anggaran 2026</p>
+        </div>
+      </div>
 
+      <div class="header-status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Layanan Online</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="application-frame" aria-label="Aplikasi unduh dokumen">
+
+        <div class="frame-accent"></div>
+
+        <div class="loader" id="loader" role="status" aria-live="polite">
+          <div class="loader-emblem" aria-hidden="true">P</div>
+
+          <p class="eyebrow">Secure Digital Service</p>
+
+          <h1>DOWNLOAD PK 2026</h1>
+
+          <p class="loader-description">
+            Menyiapkan portal dokumen Anda.
+            Mohon tunggu sebentar, aplikasi sedang dihubungkan
+            ke layanan Google Apps Script.
+          </p>
+
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-bar"></div>
+          </div>
+
+          <p class="loader-status" id="loaderStatus">
+            Menghubungkan ke server...
+          </p>
+
+          <div class="slow-message" id="slowMessage">
+            Aplikasi membutuhkan waktu lebih lama dari biasanya.
+            Koneksi internet atau proses pengalihan Google mungkin
+            sedang berlangsung. Anda dapat mencoba membuka aplikasi
+            secara langsung.
+            <br>
+
+            <a
+              class="action-link"
+              id="openDirect"
+              href="https://script.google.com/macros/s/AKfycbyhW54F7TdW0IDDA6Alwtn_ZP6C4yYIQmqAeJeSWrr8QYr980AHFOq0Z9uyw4OCvbabGQ/exec"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Buka Aplikasi Langsung ↗
+            </a>
+          </div>
+        </div>
+
+        <iframe
+          class="app-frame"
+          id="appFrame"
+          title="SIM-KDP 2026"
+          src="https://script.google.com/macros/s/AKfycbwtqQ0cxJAwkzMHlCw3KPUNVkf1NQwPOy71RRYG3s3KffMN2FSBKzeq_nzMMZl555gbQA/exec"
+          allow="clipboard-read; clipboard-write"
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <strong>PORTAL PK 2026</strong>
+        <span> · Layanan Dokumen Digital</span>
+      </div>
+
+      <div class="footer-right">
+        Akses resmi &nbsp;·&nbsp; <span id="year">2026</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    (() => {
+      const frame = document.getElementById("appFrame");
+      const loader = document.getElementById("loader");
+      const status = document.getElementById("loaderStatus");
+      const slowMessage = document.getElementById("slowMessage");
+
+      let loaded = false;
+
+      function finishLoading() {
+        if (loaded) return;
+
+        loaded = true;
+        frame.classList.add("loaded");
+        loader.classList.add("hidden");
+      }
+
+      frame.addEventListener("load", () => {
+        finishLoading();
+      });
+
+      // Tampilkan bantuan jika pengalihan atau pemuatan terlalu lama.
+      window.setTimeout(() => {
+        if (loaded) return;
+
+        status.textContent =
+          "Masih menunggu respons aplikasi...";
+
+        slowMessage.classList.add("visible");
+      }, 12000);
+
+      // Fallback visual agar pengguna tidak terus melihat layar
+      // pembuka apabila iframe memerlukan waktu sangat lama.
+      window.setTimeout(() => {
+        if (loaded) return;
+
+        finishLoading();
+      }, 25000);
+
+      document.getElementById("year").textContent =
+        new Date().getFullYear();
+    })();
+  </script>
 </body>
 </html>
+```
